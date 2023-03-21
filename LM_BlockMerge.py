@@ -114,19 +114,7 @@ def merge_models():
                print("Migrating tensor "+str(i))
             pass
         
-        # Create the merged model by replacing the layers in the second model with the merged layers
-        #for i in range(num_layers):
-        #    second_model.transformer.h[i].load_state_dict(merged_layers[i][0])
-        #    if verbose_info:
-        #       print("Migrating tensor "+str(i))
-        #    pass
-            
-        #second_model.encoder.layer[i].load_state_dict(merged_layers[i][0])
-        #merged_model = second_model
-        
         # Save the merged model to the specified path
-        #merged_model.save_pretrained("test")
-        
         if merged_model_path:
             print("Saving new model...")
             newsavedpath = merged_model_path+"/converted_model"
