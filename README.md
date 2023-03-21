@@ -12,9 +12,9 @@ python ./LM_BlockMerge.py
 1. The first model
    - The first model will be used as a base for the transformers configuration, and will be used as reference when handling the layers and weights.
 2. The second model
-   - The second model will only be used for providing the secondary layers for the selected merge.
+   - The second model will only be used for providing the secondary layers for the merge.
 3. The output folder
-   - The resulting merged layers will be saved inside the selected directory, in a folder called `"./chosen_path/"` + `"/converted_model"`
+   - The resulting model will be saved inside the selected directory, in a folder called `"./this/is/your/chosen_path/"` + `"/converted_model"`
  
 The script will then load the weights in memory, according to the precision (32/16 bit) chosen in the configuration header, and will subsequently prompt the user with a popup GUI listing all of the layers available in the selected models.
  
