@@ -41,6 +41,8 @@ Notes:
  
 # Credits:
  - Co-wrote current  LM block merge implementation:
-https://github/digitous
+ 
+      https://github/digitous
  - Original script implementation (Average weights merge):
-https://github.com/LostRuins
+ 
+      https://github.com/LostRuins
