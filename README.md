@@ -43,6 +43,7 @@ Pseudo-Supported Models:
 Notes:
  - Performing the operation in FP16 mode halves the memory requirements, but will massively slow down the process of loading up the models on memory;
  - Always outputting in fp16 is preferable to save in storage space, especially if the original weights were quantized down to 16bit already. But if your original models are using 32bit precision, then be sure whether you wish to halve the precision of the resulting file or not.
+ - Model loading is automatic; the script determines the model type and adjusts accordingly, no special command-line flags required.
  - Current GPT-NeoX support is sketchy, it tends to have an error mid-merge; it might work on GPT-NeoX and Pythia models of a smaller size 6b or lower for now until a solution is implemented.
 
 To Do:
