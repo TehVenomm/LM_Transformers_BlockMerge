@@ -33,8 +33,10 @@ max_shard_size = "2000MiB"  # Set output shard size
 verbose_info = True         # Will show model information when loading
 force_cpu = True            # Only use cpu
 ```
+
 Supported Models:
  -GPT-J, Opt, Llama
+
 Pseudo-Supported Models:
  -GPT-Neox & Pythia (may work with models smaller than 6b, larger models cause errors while merging), BERT (testing required to validate implementation)
 
