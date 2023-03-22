@@ -35,10 +35,10 @@ force_cpu = True            # Only use cpu
 ```
 
 Supported Models:
- -GPT-J, Opt, Llama
+ - GPT-J, Opt, Llama
 
 Pseudo-Supported Models:
- -GPT-Neox & Pythia (may work with models smaller than 6b, larger models cause errors while merging), BERT (testing required to validate implementation)
+ - GPT-Neox & Pythia (may work with models smaller than 6b, larger models cause errors while merging), BERT (testing required to validate implementation)
 
 Notes:
  - Performing the operation in FP16 mode halves the memory requirements, but will massively slow down the process of loading up the models on memory;
