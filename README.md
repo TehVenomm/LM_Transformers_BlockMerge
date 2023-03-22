@@ -33,10 +33,21 @@ max_shard_size = "2000MiB"  # Set output shard size
 verbose_info = True         # Will show model information when loading
 force_cpu = True            # Only use cpu
 ```
+Supported Models:
+ -GPT-J, Opt, Llama
+Pseudo-Supported Models:
+ -GPT-Neox & Pythia (may work with models smaller than 6b, larger models cause errors while merging), BERT (testing required to validate implementation)
 
 Notes:
  - Performing the operation in FP16 mode halves the memory requirements, but will massively slow down the process of loading up the models on memory;
- - Always outputting in fp16 is preferable to save in storage space, especially if the original weights were quantized down to 16bit already. But if your original models are using 31bit precision, then be sure whether you wish to halve the precision of the resulting file or not.
+ - Always outputting in fp16 is preferable to save in storage space, especially if the original weights were quantized down to 16bit already. But if your original models are using 32bit precision, then be sure whether you wish to halve the precision of the resulting file or not.
+ - Current GPT-NeoX support is sketchy, it tends to have an error mid-merge; it might work on GPT-NeoX and Pythia models of a smaller size 6b or lower for now until a solution is implemented.
+
+To Do:
+ - GUI fix; current User Interface lists layer sliders vertically in a window with no scrollbar, it will be changed to have multiple columns and scrollbars as              necessary.
+ - Research GPT-NeoX documentation for special considerations when handling GPT-NeoX layers, adjust GPT-NeoX implementation to support larger GPT-NeoX models.
+ - GUI Enhancement; looking into allowing manual entry for layer merge ratios for those who want precise numbers or don't prefer sliders.
+ - GUI-less Mode; considering adding support for GUI-less mode for those in a commandline-only environment, ideally the script will open the selected model, generate a template text document with all available layers and let the params be modified in there and the script read/execute the text merge config. (This feature may not be implemented but will look into it.)
 
  
 # Credits:
