@@ -1,7 +1,8 @@
 import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from tkinter import *
+from transformers import AutoTokenizer, AutoModelForCausalLM, LlamaForCausalLM, LlamaConfig
 import torch
 
 #mixer output settings
@@ -98,40 +99,113 @@ def merge_models():
             # Determine how much of each layer to use from each model
             first_ratio = merge_ratios[i]
             second_ratio = 1 - first_ratio
-            
+
+    # Merge the layer from the two models dependent on the model type
+
+def merge_models():
+    with torch.no_grad():
+        # Read the merge ratios from the sliders
+        merge_ratios = [layer_slider.slider.get() for layer_slider in layer_sliders]
+
+        # Merge the models using the merge ratios
+        for i in range(num_layers):
+            # Determine how much of each layer to use from each model
+            first_ratio = merge_ratios[i]
+            second_ratio = 1 - first_ratio
+# gpt-j
             # Merge the layer from the two models
-            merged_layer = (first_model.transformer.h[i].state_dict(), second_model.transformer.h[i].state_dict())        
-            for key in merged_layer[0].keys():
-                merged_layer[0][key] = first_ratio * merged_layer[0][key] + second_ratio * merged_layer[1][key]
-                
-            if verbose_info:
-               print("Merging tensor "+str(i))
-            pass
-            
-            # Create the merged model by replacing the layers in the second model with the merged layers
-            second_model.transformer.h[i].load_state_dict(merged_layer[0])
-            if verbose_info:
-               print("Migrating tensor "+str(i))
-            pass
-        
+            if hasattr(first_model, "transformer"):# and hasattr(first_model.transformer, "h"):
+                merged_layer = (first_model.transformer.h[i].state_dict(), second_model.transformer.h[i].state_dict())
+                for key in merged_layer[0].keys():
+                    merged_layer[0][key] = first_ratio * merged_layer[0][key] + second_ratio * merged_layer[1][key]
+
+                if verbose_info:
+                    print("Merging tensor " + str(i))
+
+                # Create the merged model by replacing the layers in the second model with the merged layers
+                second_model.transformer.h[i].load_state_dict(merged_layer[0])
+                if verbose_info:
+                    print("Migrating tensor " + str(i))
+# maybe BERT
+            elif hasattr(first_model, "encoder"):#and hasattr(first_model.encoder, "layer"):
+                merged_layer = (first_model.encoder.layer[i].state_dict(), second_model.encoder.layer[i].state_dict())
+                for key in merged_layer[0].keys():
+                    merged_layer[0][key] = first_ratio * merged_layer[0][key] + second_ratio * merged_layer[1][key]
+
+                if verbose_info:
+                    print("Merging tensor " + str(i))
+
+                # Create the merged model by replacing the layers in the second model with the merged layers
+                second_model.encoder.layer[i].load_state_dict(merged_layer[0])
+                if verbose_info:
+                    print("Migrating tensor " + str(i))
+# opt
+            elif hasattr(first_model, "decoder"):#and hasattr(first_model.decoder, "layer"):
+                merged_layer = (first_model.decoder.layer[i].state_dict(), second_model.decoder.layer[i].state_dict())
+                for key in merged_layer[0].keys():
+                    merged_layer[0][key] = first_ratio * merged_layer[0][key] + second_ratio * merged_layer[1][key]
+
+                if verbose_info:
+                    print("Merging tensor " + str(i))
+
+                # Create the merged model by replacing the layers in the second model with the merged layers
+                second_model.decoder.layer[i].load_state_dict(merged_layer[0])
+                if verbose_info:
+                    print("Migrating tensor " + str(i))
+# gpt-neox
+            elif hasattr(first_model, "gpt_neox"):#and hasattr(first_model.decoder, "layers"):
+                merged_layer = (first_model.gpt_neox.layers[i].state_dict(), second_model.gpt_neox.layers[i].state_dict())
+                for key in merged_layer[0].keys():
+                    merged_layer[0][key] = first_ratio * merged_layer[0][key] + second_ratio * merged_layer[1][key]
+
+                if verbose_info:
+                    print("Merging tensor " + str(i))
+
+                # Create the merged model by replacing the layers in the second model with the merged layers
+                second_model.gpt_neox.layers[i].load_state_dict(merged_layer[0])
+                if verbose_info:
+                    print("Migrating tensor " + str(i))
+# llama
+            elif hasattr(first_model, "model"):#and hasattr(first_model.decoder, "layers"):
+                merged_layer = (first_model.model.layers[i].state_dict(), second_model.model.layers[i].state_dict())
+                for key in merged_layer[0].keys():
+                    merged_layer[0][key] = first_ratio * merged_layer[0][key] + second_ratio * merged_layer[1][key]
+
+                if verbose_info:
+                    print("Merging tensor " + str(i))
+
+                # Create the merged model by replacing the layers in the second model with the merged layers
+                second_model.model.layers[i].load_state_dict(merged_layer[0])
+                if verbose_info:
+                    print("Migrating tensor " + str(i))
+ 
+            else:
+# model isn't supported
+                raise ValueError("Unsupported model architecture")
+
         # Save the merged model to the specified path
         if merged_model_path:
             print("Saving new model...")
-            newsavedpath = merged_model_path+"/converted_model"
-            
+            newsavedpath = merged_model_path + "/converted_model"
+
             if always_output_fp16 and not fp16:
                 second_model.half()
-                
+
             second_model.save_pretrained(newsavedpath, max_shard_size=max_shard_size)
             print("\nSaved to: " + newsavedpath)
         else:
             print("\nOutput model was not saved as no output path was selected.")
-        
+
         # Close the GUI
         root.destroy()
 
 commit_button = tk.Button(root, text="Commit and Merge", command=merge_models)
 commit_button.pack()
+
+def handle_return(event):
+    merge_models()
+
+root.bind('<Return>', handle_return)
 
 # Run the GUI
 root.mainloop()
