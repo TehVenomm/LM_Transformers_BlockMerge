@@ -1,12 +1,17 @@
 # Language Model Transformer Block Merge
 Image Diffusion block merging technique applied to transformers based Language Models.
 
+## Dependencies:
+Dependencies:
+```bash
+A basic python install with Transformers and Pytorch.
+```
 ## Usage:
 ### Start the script via the command
 ```bash
-python ./LM_BlockMerge.py
+[On Linux] python ./LM_BlockMerge.py
+[On Windows] python LM_BlockMerge.py
 ```
-
 ### The script will then prompt you for three folders:
 
 1. The first model
