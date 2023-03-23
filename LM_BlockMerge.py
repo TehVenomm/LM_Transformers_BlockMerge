@@ -1,4 +1,5 @@
 import os
+import shutil
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from tkinter import *
@@ -185,8 +186,9 @@ def merge_models():
                 second_model.decoder.layer[i].load_state_dict(merged_layer[0])
                 if verbose_info:
                     print("Migrating tensor " + str(i))
-# gpt-neox
+# neox/pythia
             elif hasattr(first_model, "gpt_neox"):#and hasattr(first_model.decoder, "layers"):
+                tokenizer = AutoTokenizer.from_pretrained(first_model_path, use_fast=True)
                 merged_layer = (first_model.gpt_neox.layers[i].state_dict(), second_model.gpt_neox.layers[i].state_dict())
                 for key in merged_layer[0].keys():
                     merged_layer[0][key] = first_ratio * merged_layer[0][key] + second_ratio * merged_layer[1][key]
@@ -216,11 +218,21 @@ def merge_models():
 # model isn't supported
                 raise ValueError("Unsupported model architecture")
 
-        # Save the merged model to the specified path
+#anchor got rid of the script generating a converted_model folder, simply adds / to the path now.
         if merged_model_path:
             print("Saving new model...")
-            newsavedpath = merged_model_path + "/converted_model"
-
+            newsavedpath = merged_model_path + "/"
+            #copies necessary files from the first selected model folder into the merged model folder
+# Define a list of the files to copy
+            files_to_copy = ["special_tokens_map.json", "tokenizer_config.json", "vocab.json", "merges.txt"]
+# Copy each file to the new folder
+            for filename in files_to_copy:
+                src_path = os.path.join(first_model_path, filename)
+                dst_path = os.path.join(merged_model_path, filename)
+                try:
+                    shutil.copy2(src_path, dst_path)
+                except FileNotFoundError:
+                    print("\nFile " + filename + " not found in" + first_model_path + ". Skipping.")
             if always_output_fp16 and not fp16:
                 second_model.half()
 
@@ -232,12 +244,14 @@ def merge_models():
         # Close the GUI
         root.destroy()
 
+#commit button on GUI
 commit_button = tk.Button(root, text="Commit and Merge", command=merge_models)
 commit_button.pack()
 
 def handle_return(event):
     merge_models()
 
+#allows pressing Enter (if the GUI is the current window) to commit and merge.
 root.bind('<Return>', handle_return)
 
 # Run the GUI
