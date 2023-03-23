@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
 from tkinter import *
 from transformers import AutoTokenizer, AutoModelForCausalLM, LlamaForCausalLM, LlamaConfig
 import torch
@@ -15,7 +15,38 @@ force_cpu = True            #only use cpu
 
 # Create a GUI for selecting the first and second models, and save path for merged model
 root = tk.Tk()
-#root.withdraw()
+
+# per https://www.youtube.com/watch?v=0WafQCaok6g
+# 12:05 is where he shows how to put things like buttons inside the frame
+# if you are reading this yes I used a youtube tutorial on how to make a scrollbar lol -Digitous
+root.title('Block Merge Model Layers')
+root.geometry('500x720')
+
+# Create a Main Frame
+main_frame = Frame(root)
+main_frame.pack(fill=BOTH, expand=1)
+
+# Create a Canvas
+my_canvas = Canvas(main_frame)
+my_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+
+# Add A Scrollbar To The Canvas
+my_scrollbar = ttk.Scrollbar(main_frame, orient=VERTICAL, command=my_canvas.yview)
+my_scrollbar.pack(side=RIGHT, fill=Y)
+
+# Configure The Canvas
+my_canvas.configure(yscrollcommand=my_scrollbar.set)
+my_canvas.bind('<Configure>', lambda e:my_canvas.configure(scrollregion = my_canvas.bbox("all")))
+
+# Create ANOTHER Frame INSIDE the Canvas
+second_frame = Frame(my_canvas)
+
+# Add that New frame To a Window In The Canvas
+my_canvas.create_window((0,0), window=second_frame, anchor="nw")
+
+# example w/button on how to put a thing in the window with the scrollbar, second_frame is the proper place.
+#for thing in range(100):
+#    Button(second_frame, text=f'Button {thing} Yo!').grid(row=thing, column=0, pady=10, padx=10)
 
 # Ask user to select the first model
 print("Opening file dialog, please select FIRST model directory...")
@@ -73,13 +104,15 @@ with torch.no_grad():
             self.layer_label.grid(row=0, column=0)
             
             # Create a slider for the merge ratio
-            self.slider = tk.Scale(self, from_=0, to=1, resolution=0.01, orient=tk.HORIZONTAL, length=200)
+            self.slider = tk.Scale(self, from_=0, to=1, resolution=0.01, orient=tk.HORIZONTAL, length=400)
             self.slider.grid(row=0, column=1)
             
     # Create a window with sliders for each layer
     layer_sliders = []
     for i in range(num_layers):
-        layer_slider = LayerSlider(root, i)
+#anchor second_frame puts things inside the area with the scrollbar
+#        layer_slider = LayerSlider(root, i) #modified below
+        layer_slider = LayerSlider(second_frame, i)
         layer_slider.pack()
         layer_sliders.append(layer_slider)
 
