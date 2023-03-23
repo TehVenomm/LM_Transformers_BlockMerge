@@ -2,7 +2,6 @@
 Image Diffusion block merging technique applied to transformers based Language Models.
 
 ## Dependencies:
-Dependencies:
 ```bash
 A basic python install with Transformers and Pytorch.
 ```
