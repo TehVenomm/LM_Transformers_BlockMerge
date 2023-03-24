@@ -174,8 +174,8 @@ def merge_models():
                 if verbose_info:
                     print("Migrating tensor " + str(i))
 # opt
-            elif hasattr(first_model, "decoder"):#and hasattr(first_model.decoder, "layer"):
-                merged_layer = (first_model.decoder.layer[i].state_dict(), second_model.decoder.layer[i].state_dict())
+            elif hasattr(first_model.model, "decoder"):#and hasattr(first_model.decoder, "layers"):
+                merged_layer = (first_model.model.decoder.layers[i].state_dict(), second_model.model.decoder.layers[i].state_dict())
                 for key in merged_layer[0].keys():
                     merged_layer[0][key] = first_ratio * merged_layer[0][key] + second_ratio * merged_layer[1][key]
 
@@ -183,7 +183,7 @@ def merge_models():
                     print("Merging tensor " + str(i))
 
                 # Create the merged model by replacing the layers in the second model with the merged layers
-                second_model.decoder.layer[i].load_state_dict(merged_layer[0])
+                second_model.model.decoder.layers[i].load_state_dict(merged_layer[0])
                 if verbose_info:
                     print("Migrating tensor " + str(i))
 # neox/pythia
